@@ -17,4 +17,11 @@ public class Stock {
         }
         throw new IllegalArgumentException("[ERROR] 존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
     }
+
+    public int findQuantityByName(String name) {
+        return products.stream()
+                .filter(p -> p.getName().equals(name))
+                .mapToInt(p -> p.getQuantity()) //.mapToInt(Product::getQuantity)
+                .sum();
+    }
 }

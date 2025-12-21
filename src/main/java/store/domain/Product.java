@@ -16,4 +16,8 @@ public class Product {
     public String getName() {
         return this.name;
     }
+
+    public int getQuantity() {
+        return this.quantity;
+    }
 }

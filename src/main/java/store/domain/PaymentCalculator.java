@@ -7,7 +7,11 @@ public class PaymentCalculator {
                 .forEach(item -> stock.hasEnoughStock(item.getName(), item.getQuantity()));
 
         return order.getOrderItems().stream()
-                .mapToInt(item -> stock.findPriceByName(item.getName()) * item.getQuantity())
+                .mapToInt(item -> calculateItemPurchaseAmount(item, stock))
                 .sum();
+    }
+
+    private int calculateItemPurchaseAmount(OrderItem item, Stock stock) {
+        return stock.findPriceByName(item.getName()) * item.getQuantity();
     }
 }

@@ -20,4 +20,10 @@ public class OrderItem {
     public int calculateItemTotalPrice(int price) {
         return this.quantity * price;
     }
+
+    public void validatePositiveCount(int count) {
+        if (count < 1) {
+            throw new IllegalArgumentException("[ERROR] 1개 이상의 상품만 구매하실 수 있습니다.");
+        }
+    }
 }

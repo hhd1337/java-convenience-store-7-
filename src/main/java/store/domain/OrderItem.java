@@ -1,7 +1,7 @@
 package store.domain;
 
 public class OrderItem {
-    private String name;
+    private final String name;
     private int quantity;
 
     public OrderItem(String name, int quantity) {

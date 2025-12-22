@@ -1,10 +1,10 @@
 package store.domain;
 
-public class PaymentCalculator {
+public class Payment {
     private final Order order;
     private final Stock stock;
 
-    public PaymentCalculator(Order order, Stock stock) {
+    public Payment(Order order, Stock stock) {
         this.order = order;
         this.stock = stock;
     }

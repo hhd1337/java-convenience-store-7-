@@ -8,7 +8,7 @@ public class ProductFileReader {
 
     private static final Path PATH = Path.of("src/main/resources/products.md");
 
-    public List<Product> read() {
+    public static List<Product> read() {
         return DelimitedFileReader.read(PATH, columns -> {
             String name = columns[0].trim();
             int price = Integer.parseInt(columns[1].trim());

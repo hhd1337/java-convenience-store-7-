@@ -8,7 +8,7 @@ import store.domain.promotion.Promotion;
 public class PromotionFileReader {
     private static final Path PATH = Path.of("src/main/resources/promotions.md");
 
-    public List<Promotion> read() {
+    public static List<Promotion> read() {
 
         return DelimitedFileReader.read(PATH, columns -> {
             String name = columns[0].trim();

@@ -1,11 +1,15 @@
 package store;
 
 import store.controller.ConvenienceStoreController;
+import store.view.InputView;
+import store.view.OutputView;
 
 public class Application {
     public static void main(String[] args) {
-        // TODO: 프로그램 구현
-        ConvenienceStoreController convenienceStoreController = new ConvenienceStoreController();
+        InputView inputView = new InputView();
+        OutputView outputView = new OutputView();
+
+        ConvenienceStoreController convenienceStoreController = new ConvenienceStoreController(inputView, outputView);
         convenienceStoreController.run();
     }
 }

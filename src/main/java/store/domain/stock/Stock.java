@@ -1,7 +1,6 @@
 package store.domain.stock;
 
 import java.util.List;
-import store.domain.order.OrderItem;
 import store.util.ErrorMessage;
 
 public class Stock {
@@ -19,8 +18,10 @@ public class Stock {
         }
     }
 
-    public void validateOrderProductsExist(List<OrderItem> orderItems) {
-        orderItems.forEach(item -> validateProductExistsByName(item.getName()));
+    public void validateEnoughStock(String name, int quantity) {
+        if (quantity > findQuantityByName(name)) {
+            throw new IllegalArgumentException(ErrorMessage.PREFIX + name + "상품 재고가 부족합니다. 다시 입력해주세요.");
+        }
     }
 
     public int findQuantityByName(String name) {
@@ -28,12 +29,6 @@ public class Stock {
                 .filter(p -> p.getName().equals(name))
                 .mapToInt(p -> p.getQuantity()) //.mapToInt(Product::getQuantity)
                 .sum();
-    }
-
-    public void validateEnoughStock(String name, int quantity) {
-        if (quantity > findQuantityByName(name)) {
-            throw new IllegalArgumentException(ErrorMessage.PREFIX + name + "상품 재고가 부족합니다. 다시 입력해주세요.");
-        }
     }
 
     public int findPriceByName(String name) {

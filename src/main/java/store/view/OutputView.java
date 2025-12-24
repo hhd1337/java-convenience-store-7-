@@ -1,11 +1,10 @@
 package store.view;
 
-import java.text.NumberFormat;
 import java.util.List;
 import store.dto.ReceiptDto;
+import store.view.formatter.MoneyFormatter;
 
 public class OutputView {
-    private static final NumberFormat MONEY = NumberFormat.getInstance();
 
     public void printStock(List<String> lines) {
         System.out.println("안녕하세요. w편의점입니다.");
@@ -34,7 +33,7 @@ public class OutputView {
         System.out.println("===============w 편의점==============");
         System.out.println("상품명\t\t수량\t금액");
         for (ReceiptDto.PurchaseLine line : receipt.purchases()) {
-            System.out.println(line.name() + "\t\t" + line.quantity() + "\t" + formatNumberWithComma(line.amount()));
+            System.out.println(line.name() + "\t\t" + line.quantity() + "\t" + MoneyFormatter.format(line.amount()));
         }
 
         System.out.println("================증 정================");
@@ -43,19 +42,15 @@ public class OutputView {
         }
 
         System.out.println("====================================");
-        System.out.println("총 구매액" + "\t" + receipt.summary().totalItemQuantity() + "\t" + formatNumberWithComma(
+        System.out.println("총 구매액" + "\t" + receipt.summary().totalItemQuantity() + "\t" + MoneyFormatter.format(
                 receipt.summary().totalAmountBeforeDiscount()));
-        System.out.println("행사할인" + "\t\t\t" + "-" + formatNumberWithComma(receipt.summary().promotionDiscount()));
-        System.out.println("멤버십할인" + "\t\t" + "-" + formatNumberWithComma(receipt.summary().membershipDiscount()));
-        System.out.println("내실돈" + "\t\t\t" + formatNumberWithComma(receipt.summary().finalPayAmount()));
+        System.out.println("행사할인" + "\t\t\t" + "-" + MoneyFormatter.format(receipt.summary().promotionDiscount()));
+        System.out.println("멤버십할인" + "\t\t" + "-" + MoneyFormatter.format(receipt.summary().membershipDiscount()));
+        System.out.println("내실돈" + "\t\t\t" + MoneyFormatter.format(receipt.summary().finalPayAmount()));
     }
 
     public void printMorePurchaseAskMessage() {
         System.out.print("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
-    }
-
-    private String formatNumberWithComma(int amount) {
-        return MONEY.format(amount);
     }
 
 }

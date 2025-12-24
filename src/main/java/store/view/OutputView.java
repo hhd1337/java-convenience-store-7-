@@ -1,6 +1,7 @@
 package store.view;
 
 import java.util.List;
+import store.dto.ReceiptDto;
 
 public class OutputView {
     public void printStock(List<String> lines) {
@@ -23,5 +24,25 @@ public class OutputView {
 
     public void printMembershipDiscountApplyOrNot() {
         System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+    }
+
+    public void printTotalReceipt(ReceiptDto receipt) {
+        System.out.println("===============w 편의점==============");
+        System.out.println("상품명\t\t수량\t금액");
+        for (ReceiptDto.PurchaseLine line : receipt.purchases()) {
+            System.out.println(line.name() + line.quantity() + line.amount());
+        }
+
+        System.out.println("================증 정================");
+        for (ReceiptDto.GiftLine line : receipt.gifts()) {
+            System.out.println(line.name() + line.quantity());
+        }
+
+        System.out.println("====================================");
+        System.out.println(
+                "총 구매액 " + receipt.summary().totalItemQuantity() + receipt.summary().totalAmountBeforeDiscount());
+        System.out.println("행사할인 " + "-" + receipt.summary().promotionDiscount());
+        System.out.println("멤버십할인" + "-" + receipt.summary().membershipDiscount());
+        System.out.println("내실 돈" + receipt.summary().finalPayAmount());
     }
 }

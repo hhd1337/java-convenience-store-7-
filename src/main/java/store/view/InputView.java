@@ -10,9 +10,14 @@ public class InputView {
 
     public Map<String, Integer> readProductNameAndQuantity() {
         String input = Console.readLine();
+        return parseProductNameAndQuantity(input);
+    }
+
+    private Map<String, Integer> parseProductNameAndQuantity(String input) {
         Map<String, Integer> quantitiesByName = new LinkedHashMap<>();
 
         String[] tokens = input.split(",");
+
         Arrays.stream(tokens)
                 .map(String::trim)
                 .map(s -> s.replace("[", "").replace("]", ""))

@@ -32,4 +32,8 @@ public class OrderItem {
     public void increaseQuantity(int additionalCount) {
         this.quantity = this.quantity + additionalCount;
     }
+
+    public void decreaseQuantity(int count) {
+        this.quantity = this.quantity - count;
+    }
 }

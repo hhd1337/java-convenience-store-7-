@@ -10,11 +10,12 @@ public class PromotionCatalog {
         this.promotions = promotions;
     }
 
-    public Promotion findPromotionByName(String name) {
+    public Promotion findPromotionByName(String promotionName) {
         return promotions.stream()
-                .filter(p -> p.getName().equals(name))
+                .filter(p -> p.getName().equals(promotionName))
                 .findFirst()
                 .orElseThrow(
-                        () -> new IllegalArgumentException(ErrorMessage.PREFIX + "이름이 " + name + "인 프로모션은 존재하지 않습니다."));
+                        () -> new IllegalArgumentException(
+                                ErrorMessage.PREFIX + "이름이 " + promotionName + "인 프로모션은 존재하지 않습니다."));
     }
 }

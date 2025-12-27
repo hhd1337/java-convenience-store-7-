@@ -1,7 +1,9 @@
 package store.controller;
 
 import java.util.List;
+import store.domain.order.Order;
 import store.domain.order.OrderItem;
+import store.domain.payment.Payment;
 import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
 import store.domain.stock.Stock;
@@ -39,6 +41,20 @@ public class ConvenienceStore {
                 }
             }
         }
+        // 4. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
+
+        // 3. Order, Payment 생성
+        Order order = new Order(orderItems);
+        Payment payment = new Payment(order, stock);
+
+        // 4. 멤버십 할인 받을지 입력받기
+        outputView.printMembershipDiscountApplyOrNot();
+        boolean membershipDC = inputView.readYesNo();
+        // 5. 영수증 출력
+
+        // 6. 재고 차감
+
+        // 7. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
 
     }
 

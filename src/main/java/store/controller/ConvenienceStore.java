@@ -56,7 +56,7 @@ public class ConvenienceStore {
         // 6. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
         for (OrderItem item : orderItems) {
             // 4-1. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우가 있는지 확인
-            int count = getRegularPriceCount(item, stock);
+            int count = calculateNonPromotionAppliedQuantity(item, stock);
 
             if (count > 0) {
                 outputView.printBenefitCanNotApplyDueStockLack(item.getName(), count);
@@ -108,7 +108,7 @@ public class ConvenienceStore {
 
             // 재고에 현재 프로모션 아이템 수량이 계산한 PromoProductQuantity 만큼 있는지 확인.
             // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 giftItems객체에 대입
-            int num = getRegularPriceCount(item, stock);
+            int num = calculateNonPromotionAppliedQuantity(item, stock);
             if (num > 0) {
                 PromoProductQuantity = PromoProductQuantity - num;
             }
@@ -120,7 +120,7 @@ public class ConvenienceStore {
     }
 
     // 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
-    private int getRegularPriceCount(OrderItem item, Stock stock) {
+    private int calculateNonPromotionAppliedQuantity(OrderItem item, Stock stock) {
         int orderQuantity = item.getQuantity();
         String itemName = item.getName();
 

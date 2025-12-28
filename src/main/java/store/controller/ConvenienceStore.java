@@ -1,6 +1,8 @@
 package store.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import store.domain.order.GiftItem;
 import store.domain.order.Order;
 import store.domain.order.OrderItem;
 import store.domain.payment.Payment;
@@ -37,7 +39,10 @@ public class ConvenienceStore {
             stock.validateEnoughStock(item.getName(), item.getQuantity());
         }
 
-        // 4. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
+        // 4. GiftItem 리스트를 만들음. 이후 사용자와 대화하며 orderItems와 giftItems를 계속 수정
+        List<GiftItem> giftItems = calculateGiftItems(orderItems, stock, promotionCatalog);
+
+        // 5. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
             int addCount = getAdditionalFreeCount(item, stock, promotionCatalog);
             if (addCount > 0) {
@@ -47,7 +52,8 @@ public class ConvenienceStore {
                 }
             }
         }
-        // 5. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
+
+        // 6. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
         for (OrderItem item : orderItems) {
             // 4-1. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우가 있는지 확인
             int count = getRegularPriceCount(item, stock);
@@ -64,31 +70,64 @@ public class ConvenienceStore {
             }
         }
 
-        // 6. Order, Payment 생성
+        // 7. Order, Payment 생성
         Order order = new Order(orderItems);
         Payment payment = new Payment(order, stock);
 
-        // 7. 멤버십 할인 받을지 입력받기
+        // 8. 멤버십 할인 받을지 입력받기
         outputView.printMembershipDiscountApplyOrNot();
         boolean membershipDC = inputView.readYesNo();
-        // 8. 영수증 출력
 
-        // 9. 재고 차감
+        // 9. 영수증 출력
 
-        // 10. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
+        // 10. 재고 차감
+
+        // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
 
     }
 
+    private List<GiftItem> calculateGiftItems(List<OrderItem> orderItems, Stock stock, PromotionCatalog pc) {
+        List<GiftItem> giftItems = new ArrayList<>();
+
+        for (OrderItem item : orderItems) {
+            String name = item.getName();
+            String promotionName;
+            // 이 아이템이 프로모션상품이 없으면 다음 아이템으로 넘어감.
+            try {
+                promotionName = stock.findPromotionByProductName(name);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+
+            Promotion promotion = pc.findPromotionByName(promotionName);
+
+            int buy = promotion.getBuy();
+            int get = promotion.getGet();
+            int cycle = buy + get;
+            int PromoProductQuantity = (item.getQuantity() / cycle) * get;
+
+            // 재고에 현재 프로모션 아이템 수량이 계산한 PromoProductQuantity 만큼 있는지 확인.
+            // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 giftItems객체에 대입
+            int num = getRegularPriceCount(item, stock);
+            if (num > 0) {
+                PromoProductQuantity = PromoProductQuantity - num;
+            }
+
+            giftItems.add(new GiftItem(name, PromoProductQuantity));
+        }
+
+        return giftItems;
+    }
+
+    // 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
     private int getRegularPriceCount(OrderItem item, Stock stock) {
         int orderQuantity = item.getQuantity();
         String itemName = item.getName();
 
         int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
 
-        // 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
         return Math.max(0, orderQuantity - promotionStockQuantity);
     }
-
 
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
         int orderQuantity = item.getQuantity();

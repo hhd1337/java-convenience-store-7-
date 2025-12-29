@@ -33,4 +33,12 @@ public class Payment {
             stock.validateEnoughStock(item.getName(), item.getQuantity()); // 주문한 수량이 재고에 충분히 있는지
         });
     }
+
+    public Order getOrder() {
+        return this.order;
+    }
+
+    public Stock getStock() {
+        return this.stock;
+    }
 }

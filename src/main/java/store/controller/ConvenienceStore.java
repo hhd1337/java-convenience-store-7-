@@ -2,10 +2,12 @@ package store.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import store.domain.order.Order;
 import store.domain.order.OrderItem;
 import store.domain.order.PromotionAppliedItem;
 import store.domain.payment.Payment;
+import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
 import store.domain.stock.Stock;
 import store.dto.ReceiptDto;
@@ -118,11 +120,16 @@ public class ConvenienceStore {
         gifts = promotionAppliedItems.stream()
                 .map(item -> {
                     String itemName = item.name();
-                    int get = findGetByProductName(itemName, stock, pc);
-                    int buy = findBuyByProductName(itemName, stock, pc);
-                    int giftQuantity = calculateGiftQuantity(buy, get, item.quantity());
-                    return new GiftLine(itemName, giftQuantity);
+                    Promotion promotion = findPromotionOrNull(itemName, stock, pc);
+                    if (promotion != null) {
+                        int get = promotion.getGet();
+                        int buy = promotion.getBuy();
+                        int giftQuantity = calculateGiftQuantity(buy, get, item.quantity());
+                        return new GiftLine(itemName, giftQuantity);
+                    }
+                    return null;
                 })
+                .filter(Objects::nonNull)
                 .toList();
 
         int totalItemQuantity = orderItems.stream()
@@ -177,9 +184,10 @@ public class ConvenienceStore {
 
         try {
             int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
-
-            int get = findGetByProductName(itemName, stock, pc);
-            int buy = findBuyByProductName(itemName, stock, pc);
+            String promotionName = stock.findPromotionByProductName(itemName);
+            Promotion promotion = pc.findPromotionByName(promotionName);
+            int get = promotion.getGet();
+            int buy = promotion.getBuy();
             int cycle = buy + get;
 
             int promotionApplicable = (promotionStockQuantity / cycle) * cycle;
@@ -193,25 +201,28 @@ public class ConvenienceStore {
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
         String itemName = item.getName();
         int orderQuantity = item.getQuantity();
-        int get = findGetByProductName(itemName, stock, pc);
-        int buy = findBuyByProductName(itemName, stock, pc);
-        int cycle = buy + get;
-        int remain = orderQuantity % cycle;
+        Promotion promotion = findPromotionOrNull(itemName, stock, pc);
+        if (promotion != null) {
+            int get = promotion.getGet();
+            int buy = promotion.getBuy();
+            int cycle = buy + get;
+            int remain = orderQuantity % cycle;
 
-        if (orderQuantity < buy || remain == 0 || remain < buy) {
-            return 0;
+            if (orderQuantity < buy || remain == 0 || remain < buy) {
+                return 0;
+            }
+            return cycle - remain;
         }
-        return cycle - remain;
+        return 0;
     }
 
-    private int findGetByProductName(String productName, Stock stock, PromotionCatalog pc) {
-        String promoName = stock.findPromotionByProductName(productName);
-        return pc.findPromotionByName(promoName).getGet();
-    }
-
-    private int findBuyByProductName(String productName, Stock stock, PromotionCatalog pc) {
-        String promoName = stock.findPromotionByProductName(productName);
-        return pc.findPromotionByName(promoName).getBuy();
+    private Promotion findPromotionOrNull(String productName, Stock stock, PromotionCatalog pc) {
+        try {
+            String promoName = stock.findPromotionByProductName(productName);
+            return pc.findPromotionByName(promoName);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private int calculateGiftQuantity(int buy, int get, int promotionAppliedItemsQuantity) {

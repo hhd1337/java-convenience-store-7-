@@ -1,5 +1,7 @@
 package store.controller;
 
+import camp.nextstep.edu.missionutils.DateTimes;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +34,7 @@ public class ConvenienceStore {
     public void open() {
         Stock stock = new Stock(ProductFileReader.read());
         PromotionCatalog pc = new PromotionCatalog(PromotionFileReader.read());
+        LocalDate today = DateTimes.now().toLocalDate();
 
         // 1. 인사, 재고 출력
         outputView.printStock(StockLineMapper.toLines(stock.getProducts()));
@@ -49,7 +52,7 @@ public class ConvenienceStore {
 
         // 5. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
-            int addCount = getAdditionalFreeCount(item, stock, pc);
+            int addCount = getAdditionalFreeCount(item, stock, pc, today);
             if (addCount > 0) {
                 outputView.printGetMoreItemDuePromotion(item.getName(), addCount);
                 if (inputView.readYesNo()) {
@@ -198,11 +201,14 @@ public class ConvenienceStore {
         }
     }
 
-    private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
+    private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc, LocalDate today) {
         String itemName = item.getName();
         int orderQuantity = item.getQuantity();
         Promotion promotion = findPromotionOrNull(itemName, stock, pc);
         if (promotion != null) {
+            if (!promotion.isActive(today)) {
+                return 0;
+            }
             int get = promotion.getGet();
             int buy = promotion.getBuy();
             int cycle = buy + get;

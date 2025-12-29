@@ -127,14 +127,8 @@ public class ConvenienceStore {
                 .mapToInt(OrderItem::getQuantity)
                 .sum();
         int totalAmountBeforeDiscount = payment.calculateTotalPurchaseAmount();
-        int promotionDiscount = promotionAppliedItems.stream()
-                .mapToInt(item -> {
-                    String itemName = item.name();
-                    int get = findGetByProductName(itemName, stock, pc);
-                    int buy = findBuyByProductName(itemName, stock, pc);
-                    int giftQuantity = calculateGiftQuantity(buy, get, item.quantity());
-                    return stock.findPriceByName(item.name()) * giftQuantity;
-                })
+        int promotionDiscount = gifts.stream()
+                .mapToInt(line -> stock.findPriceByName(line.name()) * line.quantity())
                 .sum();
 
         int membershipDiscount = 0;

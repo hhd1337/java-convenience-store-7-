@@ -1,6 +1,5 @@
 package store.view.parser;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,22 +13,32 @@ public class InputParser {
     public static List<OrderItem> parseOrderItems(String input) {
         Set<String> seenNames = new HashSet<>();
 
-        return Arrays.stream(input.split(ITEM_DELIMITER))
-                .map(String::trim)
-                .map(s -> s.replace("[", "").replace("]", "")) // 사이다-2
-                .map(token -> token.split(NAME_QUANTITY_DELIMITER))
-                .map(parts -> {
-                    String name = parts[0].trim();
-                    int quantity = Integer.parseInt(parts[1].trim());
+        return DelimitedParser.parseList(input, ITEM_DELIMITER, token -> {
+            String normalized = token.replace("[", "").replace("]", "");
+            String[] parts = normalized.split(NAME_QUANTITY_DELIMITER, 2);
 
-                    if (!seenNames.add(name)) {
-                        throw new IllegalArgumentException(ErrorMessage.PREFIX + "같은 상품은 합쳐서 한번만 입력해주세요: " + name);
-                    }
+            if (parts.length != 2) {
+                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 형식으로 입력해주세요.");
+            }
 
-                    OrderItem orderItem = new OrderItem(name, quantity);
-                    orderItem.validatePositiveCount(quantity);
-                    return orderItem;
-                })
-                .toList();
+            String name = parts[0].trim();
+            String qtyStr = parts[1].trim();
+
+            if (name.isEmpty() || qtyStr.isEmpty()) {
+                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 형식으로 입력해주세요.");
+            }
+
+            int quantity = StringToIntParser.parseInt(qtyStr);
+
+            if (!seenNames.add(name)) {
+                throw new IllegalArgumentException(
+                        ErrorMessage.PREFIX + "같은 상품은 합쳐서 한번만 입력해주세요: " + name
+                );
+            }
+
+            OrderItem orderItem = new OrderItem(name, quantity);
+            orderItem.validatePositiveCount(quantity);
+            return orderItem;
+        });
     }
 }

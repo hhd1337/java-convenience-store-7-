@@ -40,14 +40,13 @@ public class Stock {
                 .getPrice();
     }
 
-    public String findPromotionByProductName(String name) {
-        Product product = products.stream()
+    public String findPromotionOrNullByProductName(String name) {
+        return products.stream()
                 .filter(p -> p.getName().equals(name))
                 .filter(p -> p.getPromotion() != null)
+                .map(Product::getPromotion)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.PREFIX + name + "은(는) 프로모션 상품이 없습니다."));
-
-        return product.getPromotion();
+                .orElse(null);
     }
 
     public int findPromotionProductCountByName(String name) {

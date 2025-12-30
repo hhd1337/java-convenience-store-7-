@@ -37,9 +37,16 @@ public class ConvenienceStore {
         PromotionCatalog pc = new PromotionCatalog(PromotionFileReader.read());
         LocalDate today = DateTimes.now().toLocalDate();
 
-        // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
-        outputView.printMorePurchaseAskMessage();
-        boolean yes = retryUntilValid(inputView::readYesNo);
+        while (true) {
+            processPurchase(stock, pc, today);
+
+            // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
+            outputView.printMorePurchaseAskMessage();
+            boolean yes = retryUntilValid(inputView::readYesNo);
+            if (!yes) {
+                break;
+            }
+        }
     }
 
     private void processPurchase(Stock stock, PromotionCatalog pc, LocalDate today) {

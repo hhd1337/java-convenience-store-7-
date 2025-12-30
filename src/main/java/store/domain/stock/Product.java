@@ -28,4 +28,8 @@ public class Product {
     public String getPromotion() {
         return this.promotion;
     }
+
+    public void decreaseProduct(int num) {
+        this.quantity = this.quantity - num;
+    }
 }

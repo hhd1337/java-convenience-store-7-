@@ -10,6 +10,19 @@ public class Stock {
         this.products = products;
     }
 
+    public void decreaseStock(String name, String promotionName, int quantity) {
+        products.stream()
+                .map(p -> {
+                    String pName = p.getName();
+                    String pPromotion = p.getPromotion();
+
+                    if (pName.equals(name) && promotionName.equals(pPromotion)) {
+                        p.decreaseProduct(quantity);
+                    }
+                    return p;
+                });
+    }
+
     public void validateProductExistsByName(String name) {
         if (products.stream().noneMatch(
                 p -> p.getName().equals(name)

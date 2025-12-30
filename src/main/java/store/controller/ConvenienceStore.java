@@ -40,10 +40,7 @@ public class ConvenienceStore {
         while (true) {
             processPurchase(stock, pc, today);
 
-            // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
-            outputView.printMorePurchaseAskMessage();
-            boolean yes = retryUntilValid(inputView::readYesNo);
-            if (!yes) {
+            if (!askToContinuePurchase()) {
                 break;
             }
         }
@@ -126,6 +123,11 @@ public class ConvenienceStore {
             String name = nItem.getName();
             stock.decreaseStock(name, null, nItem.getQuantity());
         });
+    }
+
+    private boolean askToContinuePurchase() {
+        outputView.printMorePurchaseAskMessage();
+        return retryUntilValid(inputView::readYesNo);
     }
 
     private List<OrderItem> createNormalItems(List<PromotionAppliedItem> promoAppliedItems,

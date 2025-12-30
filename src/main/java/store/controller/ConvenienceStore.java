@@ -101,10 +101,19 @@ public class ConvenienceStore {
         // 10. 재고 차감
         // PromotionAppliedItem, OrderItem 가지고 NormalItem 만듦
         List<OrderItem> normalItems = createNormalItems(promotionAppliedItems, orderItems);
-        // PromotionAppliedItem 쭉 차감
 
+        // PromotionAppliedItem 쭉 차감
+        promotionAppliedItems.forEach(pItem -> {
+            String name = pItem.name();
+            String promotionName = stock.findPromotionOrNullByProductName(name);
+            stock.decreaseStock(name, promotionName, pItem.quantity());
+        });
         // NormalItem 쭉 차감
-        //stock.decreaseStock();
+        normalItems.forEach(nItem -> {
+            String name = nItem.getName();
+            stock.decreaseStock(name, null, nItem.getQuantity());
+        });
+
         // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
         outputView.printMorePurchaseAskMessage();
         boolean yes = retryUntilValid(inputView::readYesNo);

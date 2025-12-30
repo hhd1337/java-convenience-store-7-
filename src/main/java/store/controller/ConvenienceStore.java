@@ -60,9 +60,6 @@ public class ConvenienceStore {
             return items;
         });
 
-        // 4. PromotionAppliedItem 리스트를 만들음. 이후 사용자와 대화하며 orderItems와 promotionAppliedItems를 계속 수정
-        List<PromotionAppliedItem> promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock, pc);
-
         // 5. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
             int addCount = getAdditionalFreeCount(item, stock, pc, today);
@@ -93,8 +90,8 @@ public class ConvenienceStore {
             }
         }
 
-        // orderItems 변동에 따른 promotionAppliedItems 최신화
-        promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock, pc);
+        // orderItems 고정된 후 promotionAppliedItems 생성
+        List<PromotionAppliedItem> promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock, pc);
 
         // 7. Order, Payment 생성
         Order order = new Order(orderItems);
